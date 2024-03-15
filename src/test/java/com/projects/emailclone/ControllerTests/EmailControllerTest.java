@@ -6,7 +6,6 @@ import com.projects.emailclone.Service.UserImplementation;
 import com.projects.emailclone.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -57,6 +56,16 @@ public class EmailControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("Registration Successful!!", response.getBody());
     }
+    @Test
+    void testRegistration_Failure_UserAlreadyExists() {
+        User existingUser = new User();
+        when(userService.findUser(existingUser)).thenReturn(true);
+        ResponseEntity<String> response = emailController.registerUser(existingUser);
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("User already exists!!", response.getBody());
+        verify(userService).findUser(existingUser);
+    }
+
 
     @Test
     @DirtiesContext
