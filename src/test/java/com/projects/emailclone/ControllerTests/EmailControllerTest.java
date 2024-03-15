@@ -36,6 +36,15 @@ public class EmailControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         Mockito.when(request.getSession(true)).thenReturn(httpSession);
+        HttpSession session = mock(HttpSession.class);
+        try {
+            final Field field = EmailController.class.getDeclaredField("userSession");
+            field.setAccessible(true);
+            field.set(emailController, session);
+            session.setAttribute("firstName", "Mock");
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -43,7 +52,6 @@ public class EmailControllerTest {
         User user = new User();
         when(userService.findUser(user)).thenReturn(false);
         ResponseEntity<String> response = emailController.registerUser(user);
-
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("Registration Successful!!", response.getBody());
     }
@@ -91,13 +99,7 @@ public class EmailControllerTest {
     void directToSelectedOption() {
         HttpSession session = mock(HttpSession.class);
         when(session.isNew()).thenReturn(false);
-        try {
-            final Field field = EmailController.class.getDeclaredField("userSession");
-            field.setAccessible(true);
-            field.set(emailController, session);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+
         ResponseEntity<String> response1 = emailController.directToSelectedOption(1);
         assertEquals(HttpStatus.OK, response1.getStatusCode());
         assertEquals("Show Messages", response1.getBody());
@@ -110,5 +112,28 @@ public class EmailControllerTest {
         assertEquals(HttpStatus.OK, response3.getStatusCode());
         assertEquals("Log out", response3.getBody());
     }
+
+    @Test
+    void testLogout() {
+        HttpSession session = mock(HttpSession.class);
+        when(session.isNew()).thenReturn(false);
+
+        String firstName = "Mock";
+        when(session.getAttribute("firstName")).thenReturn(firstName);
+
+        try {
+            final Field field = EmailController.class.getDeclaredField("userSession");
+            field.setAccessible(true);
+            field.set(emailController, session);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        ResponseEntity<String> response = emailController.logout();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        String name = String.valueOf(session.getAttribute("firstName"));
+        assertEquals("Logged out successfully, Bye " + name, response.getBody());
+    }
+
 
 }
