@@ -67,7 +67,6 @@ public class EmailControllerTest {
         verify(userService).findUser(existingUser);
     }
 
-
     @Test
     @DirtiesContext
     void userLogin_Success() {
