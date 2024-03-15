@@ -69,7 +69,7 @@ public class EmailControllerTest {
     @Test
     void userLogin_Success() {
         User user = new User();
-        String result = "1) Show Messages\n2) Send Messages\n3) Log-out";
+        String result = "Login Successful, Welcome " + null + "\n1) Show Messages\n2) Send Messages\n3) Log-out";
         when(userImplementation.checkIfUserExists(user.getFirstName())).thenReturn(true);
         when(userImplementation.checkPassword(user.getFirstName(), user.getPassword())).thenReturn(true);
         String response = emailController.loginUser(user.getFirstName(), user.getPassword(), request);
@@ -88,7 +88,7 @@ public class EmailControllerTest {
     @Test
     void userLogin_User_InCorrect_Password() {
         User user = new User();
-        String result = "Incorrect password!!";
+        String result = "Incorrect Password!!";
         when(userImplementation.checkIfUserExists(user.getFirstName())).thenReturn(true);
         when(userImplementation.checkPassword(user.getFirstName(), user.getPassword())).thenReturn(false);
         String response = emailController.loginUser(user.getFirstName(), user.getPassword(), request);
