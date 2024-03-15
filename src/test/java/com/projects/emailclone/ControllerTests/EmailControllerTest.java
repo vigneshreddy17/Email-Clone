@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.lang.reflect.Field;
 
@@ -48,6 +49,7 @@ public class EmailControllerTest {
     }
 
     @Test
+    @DirtiesContext
     void testRegistration_Success() {
         User user = new User();
         when(userService.findUser(user)).thenReturn(false);
@@ -55,18 +57,18 @@ public class EmailControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("Registration Successful!!", response.getBody());
     }
-
     @Test
-    void testRegistration_Failed() {
-        User user = new User();
-        when(userService.findUser(user)).thenReturn(true);
-        ResponseEntity<String> response = emailController.registerUser(user);
-
+    void testRegistration_Failure_UserAlreadyExists() {
+        User existingUser = new User();
+        when(userService.findUser(existingUser)).thenReturn(true);
+        ResponseEntity<String> response = emailController.registerUser(existingUser);
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("User already exists!!", response.getBody());
+        verify(userService).findUser(existingUser);
     }
 
     @Test
+    @DirtiesContext
     void userLogin_Success() {
         User user = new User();
         String result = "Login Successful, Welcome " + null + "\n1) Show Messages\n2) Send Messages\n3) Log-out";
@@ -77,6 +79,7 @@ public class EmailControllerTest {
     }
 
     @Test
+    @DirtiesContext
     void userLogin_User_NotFound() {
         User user = new User();
         String result = "User not found";
@@ -86,6 +89,7 @@ public class EmailControllerTest {
     }
 
     @Test
+    @DirtiesContext
     void userLogin_User_InCorrect_Password() {
         User user = new User();
         String result = "Incorrect Password!!";
@@ -96,6 +100,7 @@ public class EmailControllerTest {
     }
 
     @Test
+    @DirtiesContext
     void directToSelectedOption() {
         HttpSession session = mock(HttpSession.class);
         when(session.isNew()).thenReturn(false);
@@ -114,6 +119,7 @@ public class EmailControllerTest {
     }
 
     @Test
+    @DirtiesContext
     void testLogout() {
         HttpSession session = mock(HttpSession.class);
         when(session.isNew()).thenReturn(false);
