@@ -28,16 +28,6 @@ public class UserImplementation implements UserService{
     }
 
     @Override
-    public User deleteUser(User user) {
-        return null;
-    }
-
-    @Override
-    public User updateUser(User user) {
-        return null;
-    }
-
-    @Override
     public boolean findUser(User user) {
         final String firstName = user.getFirstName();
         final String lastName = user.getLastName();
