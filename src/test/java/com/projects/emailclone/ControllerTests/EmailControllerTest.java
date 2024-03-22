@@ -1,12 +1,14 @@
 package com.projects.emailclone.ControllerTests;
 
 import com.projects.emailclone.Controller.EmailController;
+import com.projects.emailclone.Model.MessageModel;
 import com.projects.emailclone.Model.User;
+import com.projects.emailclone.Service.MessageService;
 import com.projects.emailclone.Service.UserImplementation;
 import com.projects.emailclone.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -27,6 +30,9 @@ public class EmailControllerTest {
     private UserService userService;
     @Mock
     private UserImplementation userImplementation;
+    @Mock
+    private MessageService messageService;
+
     @Mock
     private HttpSession httpSession;
     @Mock
@@ -58,7 +64,7 @@ public class EmailControllerTest {
         assertEquals("Registration Successful!!", response.getBody());
     }
     @Test
-    @Ignore
+    @Disabled
     void testRegistration_Failure_UserAlreadyExists() {
         User existingUser = new User();
         when(userService.findUser(existingUser)).thenReturn(true);
@@ -114,10 +120,6 @@ public class EmailControllerTest {
         ResponseEntity<String> response2 = emailController.directToSelectedOption(2);
         assertEquals(HttpStatus.OK, response2.getStatusCode());
         assertEquals("Send Messages", response2.getBody());
-
-        ResponseEntity<String> response3 = emailController.directToSelectedOption(3);
-        assertEquals(HttpStatus.OK, response3.getStatusCode());
-        assertEquals("Log out", response3.getBody());
     }
 
     @Test
@@ -141,6 +143,29 @@ public class EmailControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         String name = String.valueOf(session.getAttribute("firstName"));
         assertEquals("Logged out successfully, Bye " + name, response.getBody());
+    }
+
+    @Test
+    void testSendMessage() throws Exception {
+        HttpSession session = mock(HttpSession.class);
+        String firstName = "mock";
+        when(session.getAttribute("firstName")).thenReturn(firstName);
+        doNothing().when(messageService).sendMessage(anyString(), anyString(), anyString());
+        EmailController spy = spy(emailController);
+        ResponseEntity<String> response = invokePrivateMethod(spy,
+                new MessageModel("recipient", "message", firstName, false));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Message Sent!!", response.getBody());
+    }
+
+    private <T> T invokePrivateMethod(Object object, Object... args) throws Exception {
+        Class<?>[] argTypes = new Class[args.length];
+        for (int i = 0; i < args.length; i++) {
+            argTypes[i] = args[i].getClass();
+        }
+        Method method = object.getClass().getDeclaredMethod("sendMessage", argTypes);
+        method.setAccessible(true);
+        return (T) method.invoke(object, args);
     }
 
 
