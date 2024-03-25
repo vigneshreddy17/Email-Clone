@@ -45,6 +45,9 @@ The following are the main API endpoints provided by the application:
 ### Contributing
 Contributions to the Email-Clone Application are welcome! If you have any ideas for improvements or new features, feel free to open an issue or submit a pull request. Please ensure that your contributions adhere to the project's coding standards and guidelines.
 
+### Documentation
+Project documentation can be found here: https://quip.com/ktBrAH2BScfQ/Email-Application-Back-end
+
 ### License
 This project is licensed under the MIT License, which means you are free to use, modify, and distribute the code for both commercial and non-commercial purposes. However, attribution to the original project is appreciated.
 
